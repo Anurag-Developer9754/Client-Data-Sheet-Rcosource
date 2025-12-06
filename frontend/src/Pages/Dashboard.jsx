@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  LabelList,
 } from "recharts";
 
 const Dashboard = () => {
@@ -21,7 +22,6 @@ const Dashboard = () => {
 
   const [graphData, setGraphData] = useState([]);
 
-  // Fetch Dashboard Data
   const fetchDashboardData = async () => {
     try {
       const response = await getDashboardData();
@@ -42,19 +42,17 @@ const Dashboard = () => {
 
       <div className="p-4 w-full max-w-full overflow-x-hidden">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Dashboard</h1>
-
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <div className="p-5 bg-white shadow rounded-xl">
             <p className="text-lg font-semibold text-gray-600">Users</p>
             <h2 className="text-4xl font-bold text-blue-600">{stats.users}</h2>
           </div>
-
           <div className="p-5 bg-white shadow rounded-xl">
             <p className="text-lg font-semibold text-gray-600">Orders</p>
-            <h2 className="text-4xl font-bold text-green-600">{stats.orders}</h2>
+            <h2 className="text-4xl font-bold text-green-600">
+              {stats.orders}
+            </h2>
           </div>
-
           <div className="p-5 bg-white shadow rounded-xl">
             <p className="text-lg font-semibold text-gray-600">Revenue</p>
             <h2 className="text-4xl font-bold text-purple-600">
@@ -62,8 +60,6 @@ const Dashboard = () => {
             </h2>
           </div>
         </div>
-
-        {/* Line Chart Section */}
         <div className="bg-white p-5 rounded-xl shadow w-full">
           <h2 className="text-2xl font-bold text-gray-700 mb-4">
             Monthly Performance
@@ -77,19 +73,12 @@ const Dashboard = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-
-                <Line
-                  type="monotone"
-                  dataKey="orders"
-                  stroke="#1E90FF"
-                  strokeWidth={3}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#6A5ACD"
-                  strokeWidth={3}
-                />
+                <Line type="monotone" dataKey="orders" stroke="#1E90FF" strokeWidth={3} >
+                  <LabelList  dataKey="orders"  position="bottom"  offset={28}   style={{ fill: "#1E90FF", fontSize: 12 }} />
+                </Line>
+                <Line type="monotone" dataKey="revenue" stroke="#6A5ACD"strokeWidth={3} >
+                  <LabelList dataKey="revenue" position="top" formatter={(v) => `₹${v}`} style={{ fill: "#6A5ACD", fontSize: 12,fontWeight: "bold", }}/>
+                </Line>
               </LineChart>
             </ResponsiveContainer>
           </div>

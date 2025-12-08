@@ -38,15 +38,14 @@ const Dashboard = () => {
 
   return (
     <>
-      <Navbar />
 
       <div className="p-4 w-full max-w-full overflow-x-hidden">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Dashboard</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <div className="p-5 bg-white shadow rounded-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+          {/* <div className="p-5 bg-white shadow rounded-xl">
             <p className="text-lg font-semibold text-gray-600">Users</p>
             <h2 className="text-4xl font-bold text-blue-600">{stats.users}</h2>
-          </div>
+          </div> */}
           <div className="p-5 bg-white shadow rounded-xl">
             <p className="text-lg font-semibold text-gray-600">Orders</p>
             <h2 className="text-4xl font-bold text-green-600">

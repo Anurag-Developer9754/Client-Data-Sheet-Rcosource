@@ -18,7 +18,7 @@ const Login = () => {
         if (res.data.user.role === "admin") {
           window.location.href = "/admin-dashboard";
         } else {
-          window.location.href = "/user-dashboard";
+          window.location.href = "/dashboard";
         }
       } else {
         alert(res.data.message || "Invalid credentials");

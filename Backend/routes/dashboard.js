@@ -1,10 +1,10 @@
 import express from "express";
 import fs from "fs";
 import csv from "csvtojson";
+import path from "path";
 
 const router = express.Router();
 
-// Amount parsing function
 function parseAmount(amount) {
   if (!amount) return 0;
   return Number(amount.replace(/[^0-9.-]+/g, ""));
@@ -12,10 +12,19 @@ function parseAmount(amount) {
 
 router.get("/", async (req, res) => {
   try {
-    const filePath = "uploads/november.csv";
+    const month = req.query.month;
+
+    if (!month) {
+      return res.status(400).json({ error: "Please provide month in query" });
+    }
+
+    const __dirname = path.resolve();
+    const filePath = path.join(__dirname, "uploads", `${month}.csv`);
+
+    console.log("Looking for CSV file at:", filePath);
 
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: "CSV file not found" });
+      return res.status(404).json({ error: `${month}.csv file not found` });
     }
 
     const jsonArray = await csv().fromFile(filePath);
@@ -32,7 +41,6 @@ router.get("/", async (req, res) => {
       if (type !== "order") return;
 
       const date = dateRaw?.split(" ")[0];
-
       const total = parseAmount(totalStr);
 
       totalOrders++;
@@ -54,7 +62,6 @@ router.get("/", async (req, res) => {
 
     res.json({
       stats: {
-        users: 0,
         orders: totalOrders,
         revenue: Number(totalRevenue.toFixed(2)),
       },

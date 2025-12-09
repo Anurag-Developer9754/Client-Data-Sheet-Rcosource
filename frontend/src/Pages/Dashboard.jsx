@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../Component/Navbar";
 import { getDashboardData } from "../Utils/Api";
 import {
   LineChart,
@@ -15,16 +14,21 @@ import {
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
-    users: 0,
     orders: 0,
     revenue: 0,
   });
 
   const [graphData, setGraphData] = useState([]);
+  const [month, setMonth] = useState("");
 
   const fetchDashboardData = async () => {
     try {
-      const response = await getDashboardData();
+      if (!month) return;
+
+      const response = await getDashboardData({
+        params: { month }, 
+      });
+
       setStats(response.data.stats);
       setGraphData(response.data.graph);
     } catch (error) {
@@ -34,56 +38,83 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [month]);
+
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   return (
-    <>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
-      <div className="p-4 w-full max-w-full overflow-x-hidden">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Dashboard</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-          {/* <div className="p-5 bg-white shadow rounded-xl">
-            <p className="text-lg font-semibold text-gray-600">Users</p>
-            <h2 className="text-4xl font-bold text-blue-600">{stats.users}</h2>
-          </div> */}
-          <div className="p-5 bg-white shadow rounded-xl">
-            <p className="text-lg font-semibold text-gray-600">Orders</p>
-            <h2 className="text-4xl font-bold text-green-600">
-              {stats.orders}
-            </h2>
-          </div>
-          <div className="p-5 bg-white shadow rounded-xl">
-            <p className="text-lg font-semibold text-gray-600">Revenue</p>
-            <h2 className="text-4xl font-bold text-purple-600">
-              ₹{stats.revenue}
-            </h2>
-          </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl shadow w-full">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">
-            Monthly Performance
+      {/* Month Picker */}
+      <div className="mb-6">
+        <label className="block mb-1 font-semibold">Select Month</label>
+        <select 
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">-- Select Month --</option>
+          {monthNames.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="bg-white p-5 shadow rounded-xl">
+          <p className="text-gray-600">Orders</p>
+          <h2 className="text-4xl font-bold text-green-600">
+            {stats.orders}
           </h2>
+        </div>
 
-          <div className="w-full h-64 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={graphData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="orders" stroke="#1E90FF" strokeWidth={3} >
-                  <LabelList  dataKey="orders"  position="bottom"  offset={28}   style={{ fill: "#1E90FF", fontSize: 12 }} />
-                </Line>
-                <Line type="monotone" dataKey="revenue" stroke="#6A5ACD"strokeWidth={3} >
-                  <LabelList dataKey="revenue" position="top" formatter={(v) => `₹${v}`} style={{ fill: "#6A5ACD", fontSize: 12,fontWeight: "bold", }}/>
-                </Line>
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="bg-white p-5 shadow rounded-xl">
+          <p className="text-gray-600">Revenue</p>
+          <h2 className="text-4xl font-bold text-purple-600">
+            ₹{stats.revenue}
+          </h2>
         </div>
       </div>
-    </>
+
+      {/* Graph */}
+      <div className="bg-white p-5 shadow rounded-xl">
+        <h2 className="text-2xl font-bold mb-4">Daily Performance</h2>
+
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={graphData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+
+            <Line type="monotone" dataKey="orders" stroke="#1E90FF">
+              <LabelList dataKey="orders" position="top" />
+            </Line>
+
+            <Line type="monotone" dataKey="revenue" stroke="#6A5ACD">
+              <LabelList dataKey="revenue" position="top" />
+            </Line>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 };
 

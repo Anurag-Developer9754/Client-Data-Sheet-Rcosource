@@ -1,16 +1,12 @@
 import axios from "axios";
 
-// =======================================
-// AXIOS INSTANCE
-// =======================================
+
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",  // Correct backend prefix
-  timeout: 20000, // 20 sec timeout
+  baseURL: "http://localhost:5000/api",  
+  timeout: 20000, 
 });
 
-// =======================================
-// REQUEST INTERCEPTOR (Auto-Add Token)
-// =======================================
+
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -19,7 +15,7 @@ API.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    console.log("📤 Request:", config.method.toUpperCase(), config.url);
+    // console.log("📤 Request:", config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -28,13 +24,10 @@ API.interceptors.request.use(
   }
 );
 
-// =======================================
-// RESPONSE INTERCEPTOR (Show API Logs)
-// =======================================
 API.interceptors.response.use(
   (response) => {
-    console.log("📥 Response URL:", response.config.url);
-    console.log("📦 Response Data:", response.data);
+    // console.log("📥 Response URL:", response.config.url);
+    // console.log("📦 Response Data:", response.data);
     return response;
   },
   (error) => {
@@ -46,9 +39,6 @@ API.interceptors.response.use(
   }
 );
 
-// =======================================
-// API FUNCTIONS
-// =======================================
 
 // User Login
 export const loginUser = (data) => API.post("/auth/login", data);
@@ -59,9 +49,9 @@ export const uploadSheet = (formData) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 
-// Dashboard Data
-export const getDashboardData = (start, end) =>
-  API.get(`/dashboard?start=${start}&end=${end}`);
+
+export const getDashboardData = ({ params }) =>
+  API.get("/dashboard", { params });
 
 // Get All Transactions
 export const getTransactions = () => API.get("/transactions");

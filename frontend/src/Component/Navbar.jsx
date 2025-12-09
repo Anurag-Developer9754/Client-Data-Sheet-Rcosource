@@ -29,9 +29,9 @@ const Navbar = () => {
       </a>
 
       <div className="flex items-center space-x-6 text-base sm:text-lg">
-        <a href="/" className="hover:text-green-500 font-medium">
+        {/* <a href="/" className="hover:text-green-500 font-medium">
           Home
-        </a>
+        </a> */}
         <a href="/dashboard" className="hover:text-green-500 font-medium">
           Dashboard
         </a>

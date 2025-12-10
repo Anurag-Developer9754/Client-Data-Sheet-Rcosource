@@ -10,27 +10,31 @@ import {
   ResponsiveContainer,
   Legend,
   LabelList,
+  BarChart,
+  Bar
 } from "recharts";
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    orders: 0,
-    revenue: 0,
-  });
-
+  const [stats, setStats] = useState({ orders: 0, revenue: 0 });
   const [graphData, setGraphData] = useState([]);
+  const [stateGraph, setStateGraph] = useState([]);
+  const [skuGraph, setSkuGraph] = useState([]); // NEW
   const [month, setMonth] = useState("");
+  
 
   const fetchDashboardData = async () => {
     try {
       if (!month) return;
 
       const response = await getDashboardData({
-        params: { month }, 
+        params: { month },
       });
 
       setStats(response.data.stats);
       setGraphData(response.data.graph);
+      setStateGraph(response.data.stateGraph);
+      setSkuGraph(response.data.skuGraph); // NEW
+
     } catch (error) {
       console.log("Error fetching dashboard data:", error);
     }
@@ -40,30 +44,20 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [month]);
 
-
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
 
   return (
     <div className="p-4">
+
       <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
-      {/* Month Picker */}
+      {/* MONTH DROPDOWN */}
       <div className="mb-6">
-        <label className="block mb-1 font-semibold">Select Month</label>
-        <select 
+        <label className="block font-semibold mb-1">Select Month</label>
+        <select
           value={month}
           onChange={(e) => setMonth(e.target.value)}
           className="border p-2 rounded"
@@ -75,25 +69,21 @@ const Dashboard = () => {
         </select>
       </div>
 
-      {/* Stats */}
+      {/* STAT BOXES */}
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div className="bg-white p-5 shadow rounded-xl">
           <p className="text-gray-600">Orders</p>
-          <h2 className="text-4xl font-bold text-green-600">
-            {stats.orders}
-          </h2>
+          <h2 className="text-4xl font-bold text-green-600">{stats.orders}</h2>
         </div>
 
         <div className="bg-white p-5 shadow rounded-xl">
           <p className="text-gray-600">Revenue</p>
-          <h2 className="text-4xl font-bold text-purple-600">
-            ₹{stats.revenue}
-          </h2>
+          <h2 className="text-4xl font-bold text-purple-600">₹{stats.revenue}</h2>
         </div>
       </div>
 
-      {/* Graph */}
-      <div className="bg-white p-5 shadow rounded-xl">
+      {/* DAILY LINE CHART */}
+      <div className="bg-white p-5 shadow rounded-xl mb-10">
         <h2 className="text-2xl font-bold mb-4">Daily Performance</h2>
 
         <ResponsiveContainer width="100%" height={300}>
@@ -114,6 +104,56 @@ const Dashboard = () => {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* STATE WISE BAR CHART */}
+      <div className="bg-white p-5 shadow rounded-xl mb-10">
+        <h2 className="text-2xl font-bold mb-4">State Wise Orders & Revenue</h2>
+
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={stateGraph}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="state" angle={-45} textAnchor="end" height={100} interval={0} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+
+            <Bar dataKey="orders" fill="#1E90FF">
+              <LabelList dataKey="orders" position="top" />
+            </Bar>
+
+            <Bar dataKey="revenue" fill="#6A5ACD">
+              <LabelList dataKey="revenue" position="top" />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* SKU WISE BAR CHART (NEW) */}
+      <div className="bg-white p-5 shadow rounded-xl mt-10">
+  <h2 className="text-2xl font-bold mb-4">Top SKU Wise Order Count</h2>
+
+  <ResponsiveContainer width="100%" height={450}>
+    <BarChart data={skuGraph}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        dataKey="sku"
+        angle={-45}
+        textAnchor="end"
+        interval={0}
+        height={120}
+      />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+
+      <Bar dataKey="orders" fill="#1E90FF">
+        <LabelList dataKey="orders" position="top" />
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
+
     </div>
   );
 };

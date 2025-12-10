@@ -26,8 +26,8 @@ API.interceptors.request.use(
 
 API.interceptors.response.use(
   (response) => {
-    // console.log("📥 Response URL:", response.config.url);
-    // console.log("📦 Response Data:", response.data);
+    console.log("📥 Response URL:", response.config.url);
+    console.log("📦 Response Data:", response.data);
     return response;
   },
   (error) => {

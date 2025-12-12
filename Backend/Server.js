@@ -8,75 +8,59 @@ import mongoose from "mongoose";
 import dashboardRoute from "./routes/dashboard.js";
 import authRoutes from "./routes/authRoutes.js";
 
-// ===============================
-//   LOAD ENV FILE (.env)
-// ===============================
 dotenv.config();
 
-// Check if env loaded
-console.log("Loaded MONGO_URI =", process.env.MONGO_URI);
-
 // ===============================
-//       CONNECT MONGODB
+// CONNECT MONGO
 // ===============================
 mongoose
-  .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 5000,
-  })
+  .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ DB Connection Error:", err));
+  .catch((err) => console.error("❌ DB Error:", err));
 
-// ===============================
-//       EXPRESS APP SETUP
-// ===============================
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // ===============================
-//     MULTER UPLOAD SETUP
+// MULTER STORAGE (FINAL FIX)
 // ===============================
-const upload = multer({ dest: "uploads/" });
+// Yahan file ORIGINAL NAME se save hogi → January.csv, February.csv...
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
 
-// ===============================
-//        TEST API
-// ===============================
-app.get("/api/transactions", (req, res) => {
-  res.json({ message: "API Connected Successfully!" });
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);  // 👈 EXACT FIX: Undefined.csv problem solved
+  },
 });
 
-// ===============================
-//        CSV UPLOAD API
-// ===============================
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-  try {
-    const jsonArray = await csv().fromFile(req.file.path);
+const upload = multer({ storage });
 
-    res.json({
+// ===============================
+// CSV UPLOAD API
+// ===============================
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  try {
+    return res.json({
       status: "success",
-      rows: jsonArray.length,
-      data: jsonArray,
+      filename: req.file.originalname,
+      message: `${req.file.originalname} uploaded successfully`,
     });
-  } catch (error) {
-    res.status(500).json({ error: "CSV Parse Error" });
+  } catch (e) {
+    return res.status(500).json({ error: "CSV upload failed" });
   }
 });
 
 // ===============================
-//         AUTH ROUTES
+// ROUTES
 // ===============================
 app.use("/api/auth", authRoutes);
-
-// ===============================
-//       DASHBOARD ROUTES
-// ===============================
 app.use("/api/dashboard", dashboardRoute);
 
 // ===============================
-//        START SERVER
+// START SERVER
 // ===============================
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
